@@ -1,0 +1,235 @@
+session.py
+Constants
+BAD_REQUEST: Error code for a bad request (1).
+DAEMON_ERROR: Error code for daemon errors (2).
+Functions
+scripthash_to_hashX(scripthash):
+
+Converts a script hash to a binary hash (hashX).
+Raises an RPCError if the input is not a valid script hash.
+non_negative_integer(value):
+
+Validates if a given value can be converted to a non-negative integer.
+Raises an RPCError if the conversion fails or the value is negative.
+assert_boolean(value):
+
+Checks if the given value is a boolean (either True or False).
+Raises an RPCError if the value is not a boolean.
+assert_tx_hash(value):
+
+Validates whether the provided value is a valid hexadecimal transaction hash and converts it to a 32-byte binary hash.
+Raises an RPCError if the validation fails.
+assert_raw_bytes(value):
+
+Converts a hexadecimal string to raw bytes.
+Raises an RPCError if the input cannot be converted.
+Classes
+1. SessionGroup (using attr.s for attribute management)
+Attributes:
+name: The name of the session group.
+weight: A weight associated with the group.
+sessions: The sessions belonging to this group.
+retained_cost: Cost retained by the group.
+Methods:
+session_cost(): Calculates the total cost of all sessions in the group.
+cost(): Returns the total cost by adding retained cost and session cost.
+2. SessionReferences (also using attr.s)
+Attributes:
+sessions: A set of sessions.
+groups: A list of groups.
+specials: Lower-case strings representing special references.
+unknown: Strings representing unknown references.
+3. SessionManager
+Description: Manages the state of all sessions in the server.
+Constructor Attributes:
+Initializes various attributes related to the environment, database, services, and session management.
+Sets up logging, cache, and session tracking.
+Key Methods:
+_ssl_context(): Sets up SSL context for secure connections.
+_start_servers(services): Starts listening servers for the given services.
+_start_external_servers(): Starts external TCP/SSL servers based on environment settings.
+_stop_servers(services): Stops the specified servers.
+_manage_servers(): Manages session limits and pauses new connections when a maximum session count is reached.
+_log_sessions(): Periodically logs session information.
+_disconnect_sessions(sessions, reason): Disconnects specified sessions and logs the reason.
+_clear_stale_sessions(): Disconnects sessions that have been inactive for too long.
+_handle_chain_reorgs(): Handles blockchain reorganizations by clearing caches.
+_recalc_concurrency(): Recalculates session concurrency periodically based on session costs.
+_get_info(): Returns a summary of server state and session information.
+_session_data(for_log): Gathers and formats data about active sessions for logging.
+_group_data(): Collects data on session groups for RPC calls.
+rpc_add_peer:
+
+Purpose: Adds a new peer to the server.
+Parameter: real_name - a string containing peer information in a specific format.
+Returns: A confirmation message indicating the peer has been added.
+rpc_disconnect:
+
+Purpose: Disconnects specified sessions based on session IDs provided in an array.
+Parameter: session_ids - array of session IDs to disconnect.
+Returns: A list of messages about the disconnection status of sessions and groups, including any unknown IDs.
+rpc_log:
+
+Purpose: Toggles logging for specified sessions or groups.
+Parameter: session_ids - array of session/group IDs or special values ('all', 'none', 'new').
+Returns: A list of messages indicating whether logging is enabled or disabled for each session/group.
+rpc_daemon_url:
+
+Purpose: Changes the URL of the daemon the server connects to.
+Parameter: daemon_url - the new URL for the daemon.
+Returns: A message indicating the current daemon URL being used.
+rpc_stop:
+
+Purpose: Shuts down the server cleanly.
+Returns: A message indicating that the server is stopping.
+rpc_getinfo:
+
+Purpose: Retrieves summary information about the server process.
+Returns: A structured summary of the server’s current state and information.
+rpc_groups:
+
+Purpose: Provides statistics about session groups.
+Returns: A collection of statistics related to the session groups managed by the server.
+rpc_peers:
+
+Purpose: Returns a list of peer information managed by the server.
+Returns: Data regarding the peers currently connected to the server.
+rpc_query:
+
+Purpose: Fetches data regarding a script, address, or name.
+Parameters:
+items: A list of scripts or addresses to query.
+limit: A limit on the number of historical transactions or UTXOs to return.
+Returns: A list of transaction histories, UTXOs, and balance information based on the queries.
+rpc_sessions:
+
+Purpose: Provides statistics about the currently connected sessions.
+Returns: Session data that includes connection status and metrics.
+rpc_reorg:
+
+Purpose: Forces a reorganization of a specified number of blocks in the blockchain.
+Parameter: count - the number of blocks to reorganize.
+Returns: A message indicating that a reorganization has been scheduled.
+Additional Features
+The serve method is designed to start the RPC server and handle multiple tasks related to peer discovery, managing connections, and more.
+The server handles various session states, connection costs, and session management for scalability and efficient operation.
+Logging and debugging capabilities are built in, allowing for comprehensive tracking of server activities.
+raw_header(self, height):
+
+This asynchronous method retrieves the binary header for a given block height from the database.
+If the height is out of range, it raises an RPCError.
+broadcast_transaction(self, raw_tx):
+
+This method broadcasts a raw transaction to the daemon.
+It increments the count of sent transactions and returns the transaction's hex hash.
+limited_history(self, hashX):
+
+Returns a sorted list of transaction hashes and their heights, along with a cost.
+Implements a DoS (Denial of Service) limit based on the maximum size of responses.
+It caches the results to optimize repeated queries, adjusting the cost based on the number of entries returned.
+_notify_sessions(self, height, touched):
+
+Notifies all active sessions about changes in block height and which addresses have been touched (i.e., affected by new transactions).
+If the height has changed, it refreshes the subscribed results and invalidates any cached history related to touched addresses.
+_ip_addr_group_name(self, session):
+
+Generates a group name based on the session's IP address.
+It accounts for whether the address is private and returns a summary group name.
+_timeslice_name(self, session):
+
+Creates a name based on the time slice of the session, useful for grouping sessions by their duration.
+_session_group(self, name, weight):
+
+Retrieves or creates a session group based on the name and weight (priority).
+If no group exists, it creates a new one.
+add_session(self, session):
+
+Adds a new session to the manager and sets its event.
+Determines the session's groups based on the IP and timeslice.
+remove_session(self, session):
+
+Removes a session from the manager, adjusting the associated groups and costs.
+SessionBase Class Overview
+SessionBase:
+Inherits from RPCSession and provides a base for ElectrumX JSON sessions.
+Manages asynchronous tasks and connections, tracking session details like IP address and session ID.
+Handles connection loss gracefully, ensuring the session is removed from the manager.
+ElectrumX Class Overview
+ElectrumX:
+Inherits from SessionBase and manages TCP connections for Electrum clients.
+Defines protocol limits, features, and manages subscriptions for headers and addresses.
+Handles client notifications about changes in blockchain state and transactions related to subscribed addresses.
+Key Functionalities
+Asynchronous Programming: The code extensively uses async/await patterns, allowing for concurrent handling of multiple sessions.
+Error Handling: Uses exceptions to manage errors like out-of-range requests and database access issues.
+Session Management: Implements mechanisms for adding and removing sessions while grouping them by criteria like IP address and time slice.
+Caching and Cost Management: Includes logic to cache results of queries and calculate costs for sessions based on their activity.
+scripthash_get_history:
+
+Returns the confirmed and unconfirmed transaction history for a given script hash.
+scripthash_get_mempool:
+
+Returns the list of unconfirmed transactions associated with the provided script hash.
+scripthash_listunspent:
+
+Retrieves the list of unspent transaction outputs (UTXOs) for a script hash.
+scripthash_subscribe:
+
+Subscribes to changes related to a specific script hash.
+scripthash_unsubscribe:
+
+Unsubscribes from a script hash, potentially decrementing resource costs.
+_merkle_proof:
+
+Generates a Merkle proof for transactions in the blockchain based on provided heights.
+block_header:
+
+Returns the raw block header as a hex string, optionally including a Merkle proof.
+block_headers:
+
+Returns multiple concatenated block headers starting from a specified height.
+is_tor:
+
+Checks if the connection is made to a Tor hidden service.
+replaced_banner:
+
+Replaces placeholder text in a server banner with actual server details.
+donation_address:
+
+Returns the donation address, if available.
+banner:
+
+Generates a server banner message, including details about the server version and possible warnings.
+relayfee:
+
+Provides the minimum fee for low-priority transactions to be accepted.
+estimatefee:
+
+Estimates the fee per kilobyte required for transactions to be included in a certain number of blocks.
+ping:
+
+Acts as a keep-alive mechanism for clients.
+server_version:
+
+Returns the version of the server and handles client protocol version negotiation.
+transaction_broadcast:
+
+Broadcasts a raw transaction to the network.
+transaction_get:
+
+Retrieves the raw transaction data for a given transaction hash.
+transaction_merkle:
+
+Returns the Merkle branch for a confirmed transaction.
+transaction_bmm_merkle:
+
+Provides a BMM (Block Merging Mechanism) Merkle proof for a transaction.
+transaction_id_from_pos:
+
+Returns the transaction ID and optionally a Merkle proof given the block height and position.
+compact_fee_histogram:
+
+Returns a fee histogram (currently returns an empty list).
+set_request_handlers:
+
+Sets up the appropriate request handlers for various blockchain calls.

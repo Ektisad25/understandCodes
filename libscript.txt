@@ -1,0 +1,26 @@
+This code defines script-related classes and functions, primarily for handling blockchain transaction scripts in the Radiant blockchain. The script includes handling and parsing of various opcodes, particularly for managing P2PKH (Pay-to-Pubkey-Hash) and P2SH (Pay-to-Script-Hash) transaction outputs, as well as specific opcodes added for Radiant.
+
+Key components:
+
+1. OpCodes Enumeration
+The OpCodes class lists several operation codes (opcodes) used within transaction scripts. These opcodes define actions like pushing data, checking signatures, and interacting with script state, such as:
+
+Standard Bitcoin opcodes: OP_DUP, OP_HASH160, OP_EQUAL, OP_CHECKSIG, etc.
+Radiant-specific opcodes: OP_CHECKDATASIG, OP_PUSHINPUTREF, OP_STATESEPERATOR, and others designed for stateful transactions and input references.
+2. Utility Functions
+is_unspendable_legacy and is_unspendable_genesis: These functions check if a script is unspendable (usually scripts containing OP_RETURN).
+_match_ops: Helper to match opcode patterns in scripts.
+3. ScriptPubKey Class
+This class manages output scripts (conditions for spending outputs). It defines two common types of scripts:
+
+P2PKH_script: Creates a Pay-to-Pubkey-Hash script.
+P2SH_script: Creates a Pay-to-Script-Hash script.
+4. Script Class
+This class handles several operations involving transaction scripts:
+
+get_stateseperator_index: Finds the state separator opcode (OP_STATESEPERATOR) in a script, which is a Radiant-specific opcode for handling transaction state.
+get_ops: Parses and returns the list of operations (opcodes) in a script.
+get_push_input_refs: Extracts references to inputs (OP_PUSHINPUTREF and OP_PUSHINPUTREFSINGLETON).
+dedup_refs: De-duplicates the input references.
+zero_refs: (partially defined) Would handle setting input references to zero in scripts.
+These functions and classes are crucial for creating, parsing, and validating transaction scripts, especially with the additional complexity of Radiant's custom opcodes. If you're implementing transaction construction or validation for Radiant, these components will help manage the specifics of Radiant's scripting system.

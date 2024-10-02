@@ -1,0 +1,9 @@
+This module manages the historical transaction data associated with specific script hashes (addresses) in the ElectrumX framework. It provides functionality for tracking, storing, and compacting transaction history, ensuring efficient database operations and retrieval.
+
+Key features include:
+
+Database Management: Handles opening, closing, and reading the state of the history database, with version control for database upgrades.
+Transaction History: Allows for the addition of unflushed transaction entries and provides methods to fetch transaction numbers for specific script hashes.
+Compaction: Implements methods for compaction of historical data to optimize storage, including mechanisms for backing up and removing outdated entries.
+Memory Management: Monitors unflushed data sizes and enforces limits to prevent excessive memory usage.
+This module is crucial for maintaining the integrity and efficiency of transaction history in the ElectrumX server.

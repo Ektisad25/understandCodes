@@ -1,0 +1,31 @@
+storage.py file provides an abstraction layer for database storage engines used in ElectrumX, which is a server implementation for the Bitcoin protocol. Here’s a brief explanation of its components:
+
+Key Components:
+Imports: The module imports necessary libraries, including os, pytest, and utility functions from electrumx.lib.util.
+
+db_class(name) Function:
+
+This function returns a database engine class based on the provided name. It raises a pytest.skip() if the name is "skip".
+It searches for subclasses of the Storage class and imports the relevant module for the specified database class.
+Storage Class:
+
+An abstract base class that defines the interface for database storage engines.
+It initializes with a database name and a flag for synchronization. If the database does not exist, it opens or creates one.
+Contains several abstract methods that subclasses must implement: import_module, open, close, get, put, write_batch, and iterator.
+LevelDB Class:
+
+A concrete implementation of the Storage class using the LevelDB database engine.
+Implements required methods and uses the plyvel library to interact with LevelDB.
+RocksDB Class:
+
+Another concrete implementation of the Storage class, this time for the RocksDB database engine.
+It provides specific configurations for opening a RocksDB instance and implements methods for database operations using the rocksdb library.
+RocksDBWriteBatch Class:
+
+This class manages write batches for RocksDB. It ensures that multiple writes can be executed as a single batch operation, committing only if no exceptions occur.
+RocksDBIterator Class:
+
+This class allows iteration over key-value pairs in RocksDB, with support for prefixes and reverse iteration. It ensures that only keys that start with the specified prefix are yielded.
+Summary:
+Overall, storage.py serves as a foundational component for managing different database backends (LevelDB and RocksDB) within the ElectrumX server. 
+It defines an abstract interface for database operations, ensuring that various implementations can be used interchangeably while adhering to a common set of methods and behaviors.

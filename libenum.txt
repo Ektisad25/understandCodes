@@ -1,0 +1,34 @@
+This code defines two classes, EnumError and Enumeration, which implement a custom enumeration system in Python, similar to Python's built-in enum module. Here's a breakdown of how it works:
+
+1. EnumError (Custom Exception Class):
+EnumError is a subclass of Exception and is raised when there is an issue with the enumeration, such as a non-unique name or value, or an incorrect data type (e.g., expecting a string or integer).
+2. Enumeration Class:
+Purpose: This class allows you to create a custom enumeration from a list of names and values.
+Attributes:
+lookup: A dictionary that maps enum names (strings) to their corresponding values (integers).
+reverseLookup: A dictionary that maps enum values (integers) to their corresponding names (strings).
+Key Methods:
+__init__(self, name, enumList):
+Initializes the enumeration with a name and a list of enum members.
+enumList can be a list of strings (names) or tuples (name, value) pairs.
+Validates that the names are unique strings and the values are unique integers.
+Populates lookup and reverseLookup dictionaries for quick lookup of names and values.
+__getattr__(self, attr):
+This method allows accessing enum values as if they were attributes. For example, if you have an enum member called RED, you could access its value with enum.RED.
+If an invalid enum name is accessed, it raises an AttributeError.
+whatis(self, value):
+This method performs a reverse lookup: given an enum value (integer), it returns the corresponding enum name (string).
+Example Usage:
+colors = Enumeration('Colors', [('RED', 1), ('GREEN', 2), ('BLUE', 3)])
+
+# Accessing enum values:
+print(colors.RED)    # Output: 1
+
+# Reverse lookup:
+print(colors.whatis(2))   # Output: 'GREEN'
+
+Error Handling:
+If a name isn't a string or a value isn't an integer, an EnumError is raised.
+Duplicate names or values will also raise EnumError, ensuring that the enumeration is unique and valid.
+Summary:
+The Enumeration class allows creating a custom enumeration system with strict validation on the names and values, and it provides both name-to-value and value-to-name lookups.

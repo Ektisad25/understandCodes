@@ -1,0 +1,10 @@
+This code defines classes and methods related to handling Radiant blockchain coins, specifically for various network types such as mainnet, testnet, scaling testnet, and regtest. Here's a breakdown of key components:
+
+Genesis Block Validation: The genesis_block method checks if the given block matches the expected genesis block hash for the network.
+Previous Block Hash: The header_prevhash method extracts the previous block's hash from a block header.
+Decimal Value Conversion: The decimal_value method converts the smallest unit of the coin into standard coin units (e.g., converting photons to RXD).
+Script Hashing: Methods like codeScriptHash_from_script and hashX_from_script compute different types of hashes from scripts, essential for address validation and transaction handling.
+Address to Script Conversion: The pay_to_address_script converts addresses into a public key script for transaction purposes.
+Network Configurations: Classes like RadiantTestnet, RadiantScalingTestnet, and RadiantRegtest configure different aspects of the network (peer connections, genesis hash, block size, etc.).
+Prefetch Limits: The prefetch_limit method defines how many blocks can be prefetched based on the blockchain height.
+This structure is designed to handle Radiant blockchain operations for various environments.

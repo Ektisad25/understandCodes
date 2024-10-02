@@ -1,0 +1,30 @@
+This code provides an implementation of Merkle trees, focusing on calculations for Merkle proofs, roots, and branches. Here's an explanation of the core components:
+
+1. Merkle Class
+The Merkle class handles the construction of Merkle trees from a list of binary hashes. It offers methods to compute Merkle branches, the root, and verify proofs.
+
+Key Methods:
+tree_depth(hash_count): Computes the depth of the Merkle tree given the number of hashes.
+branch_length(hash_count): Determines the length of the Merkle branch, i.e., the number of levels in the tree.
+branch_and_root(hashes, index, length=None, tsc_format=False): Returns a tuple containing the Merkle branch and the Merkle root for a specific hash at the given index. The branch is essentially a proof path, which can be used to verify that the hash is part of the tree.
+root(hashes, length=None): Calculates the root of the Merkle tree.
+root_from_proof(hash_, branch, index): Verifies a Merkle proof by recreating the Merkle root from a hash, its branch, and its index in the original hash list.
+level(hashes, depth_higher): Computes a specific level of the Merkle tree by repeatedly hashing pairs of hashes up to the given depth.
+branch_and_root_from_level(level, leaf_hashes, index, depth_higher, tsc_format=False): Calculates a Merkle branch and root from a specific tree level.
+2. MerkleCache Class
+The MerkleCache class provides an efficient way to compute Merkle branches and roots using cached tree levels.
+
+Key Methods:
+initialize(length): Initializes the cache for a Merkle tree with a given length of hashes.
+truncate(length): Trims the cache to ensure it only contains up to a specific number of hashes.
+branch_and_root(length, index, bmm_format=False): Returns a Merkle branch and root for a hash at a specific index in the tree.
+Efficiency Techniques:
+Source function: It expects a function source_func(index, count) that fetches hashes, potentially from a database or network.
+Partial tree caching: The class stores intermediate tree levels, which reduces redundant calculations when repeatedly querying the same Merkle tree.
+Merkle Tree Construction Logic
+If the number of hashes is odd, the last hash is duplicated to ensure that the tree structure is complete (i.e., every level has an even number of hashes).
+As you go up each level of the tree, the hash of each pair of hashes is computed using a specified hash_func (defaulting to double_sha256).
+The Merkle root is derived by repeatedly hashing pairs of hashes from the bottom layer up to the root.
+Merkle Proofs
+A Merkle proof allows you to verify that a specific hash is part of a larger Merkle tree by providing a branch (a series of hashes) that leads up to the root. This reduces the amount of data needed to verify inclusion in a large dataset, as you only need the branch hashes and the root instead of the entire dataset.
+

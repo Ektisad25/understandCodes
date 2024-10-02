@@ -1,0 +1,60 @@
+Classes
+MemPoolTx:
+
+Represents a transaction in the mempool.
+Attributes:
+prevouts: Previous outputs.
+in_pairs: Input pairs as (hashX, value) tuples.
+out_pairs: Output pairs as (hashX, value) tuples.
+fee: Transaction fee.
+size: Size of the transaction.
+out_srefs: References to outputs.
+idx_to_script: Maps output index to the full output script.
+MemPoolTxSummary:
+
+A summary representation of a transaction in the mempool.
+Attributes:
+hash: Transaction hash.
+fee: Transaction fee.
+has_unconfirmed_inputs: Indicates if the transaction has unconfirmed inputs.
+DBSyncError:
+
+Custom exception for database synchronization errors.
+MemPoolAPI (abstract class):
+
+Interface for querying the mempool and blockchain state.
+Methods include:
+height: Queries the blockchain height.
+cached_height: Returns the cached blockchain height.
+db_height: Returns the height of the on-disk database.
+mempool_hashes: Gets hashes of all transactions in the mempool.
+raw_transactions: Fetches serialized raw transactions based on given hashes.
+lookup_utxos: Looks up unspent transaction outputs.
+on_mempool: Notified when the mempool is synchronized.
+MemPool:
+
+Represents the mempool of the daemon.
+Attributes:
+coin: Coin class instance.
+api: Instance of MemPoolAPI.
+txs: Maps transaction hashes to MemPoolTx instances.
+hashXs: Maps hashX to sets of transaction hashes.
+Other mappings for tracking UTXOs and scripts.
+Key methods:
+_logging: Logs regular mempool stats.
+_accept_transactions: Accepts transactions into the mempool based on input availability.
+_refresh_hashes: Refreshes the view of the daemon's mempool.
+_process_mempool: Processes new and removed transactions from the mempool.
+_fetch_and_accept: Fetches and accepts mempool transactions.
+Key Functions and Methods
+MemPool.init: Initializes the mempool with the given coin, API, and refresh intervals.
+
+_logging: Continuously logs the state of the mempool, including transaction count and size.
+
+_accept_transactions: Accepts new transactions into the mempool if all their inputs are available, updating various mappings accordingly.
+
+_refresh_hashes: Periodically refreshes the mempool by querying for transaction hashes and updating the local state.
+
+_process_mempool: Handles transactions that have been added or removed from the mempool.
+
+_fetch_and_accept: Fetches raw transactions for given hashes, deserializing them and preparing them for acceptance into the mempool.

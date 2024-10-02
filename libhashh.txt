@@ -1,0 +1,36 @@
+This code provides cryptographic hash functions and base58 encoding/decoding utilities, commonly used in blockchain and cryptocurrency systems like Radiant or Bitcoin. Here's a breakdown of its main parts:
+
+Cryptographic Hash Functions:
+sha256(x): A wrapper for SHA-256 hashing using Python’s hashlib library. It takes an input x and returns its SHA-256 hash.
+
+ripemd160(x): Another hash function that uses RIPEMD-160 (shorter than SHA-256), which is common in Bitcoin for address creation.
+
+double_sha256(x): Computes SHA-256 twice. This is used in blockchain systems like Radiant or Bitcoin for added security (e.g., block hashes).
+
+double_sha512_256(x): Similar to double SHA-256, but uses SHA-512/256, another hash function variation with truncation to 256 bits.
+
+hash_to_hex_str(x): Converts a binary (big-endian) hash to a hex string by reversing the byte order before converting to hex. This is for displaying hashes in the typical hexadecimal format used in block explorers.
+
+hex_str_to_hash(x): Converts a hex string back to a binary hash by reversing the process of hash_to_hex_str.
+
+Base58 Encoding/Decoding:
+Base58 encoding is commonly used in cryptocurrency addresses to represent long binary data in a more human-readable form without ambiguous characters.
+
+Base58Error: A custom exception class for handling errors specific to Base58 encoding/decoding.
+
+Base58 Class:
+
+Purpose: Provides functionality for encoding/decoding using Base58 (e.g., Bitcoin addresses).
+Attributes:
+chars: The set of 58 characters used in Base58 encoding, excluding ambiguous characters like 0, O, I, and l.
+cmap: A dictionary mapping each Base58 character to its numeric value.
+Methods:
+char_value(c): Converts a Base58 character to its numeric value, raising an error if the character is invalid.
+decode(txt): Decodes a Base58 string into a byte array (big-endian). It multiplies the accumulated value by 58 for each character and adds its corresponding numeric value.
+encode(be_bytes): Encodes a byte array into a Base58 string by converting it to an integer, repeatedly dividing by 58 and storing the remainder as a Base58 character.
+decode_check(txt, *, hash_fn=double_sha256): Decodes a Base58Check-encoded string (used in cryptocurrency addresses), verifying a checksum derived from hash_fn (by default, double SHA-256). The checksum ensures data integrity.
+encode_check(payload, *, hash_fn=double_sha256): Encodes a byte array (with a version prefix) into a Base58Check string by appending a checksum and then encoding using Base58.
+Summary:
+The code provides cryptographic hash functions (SHA-256, RIPEMD-160, etc.) that are crucial in cryptography, particularly for blockchain systems.
+It also includes Base58 encoding/decoding for human-readable addresses, including Base58Check encoding, which includes checksums for error detection.
+These utilities are foundational for cryptocurrency wallets, address generation, transaction verification, and data integrity.
